@@ -481,9 +481,6 @@ public abstract class BukkitData implements Data {
         private static void addMaterialStatistic(@NotNull Player p, @NotNull Statistic id,
                                                  @NotNull Map<String, Map<String, Integer>> map, boolean isBlock) {
             Registry.MATERIAL.forEach(material -> {
-                if ((material.isBlock() && !isBlock) || (material.isItem() && isBlock)) {
-                    return;
-                }
                 final int stat = p.getStatistic(id, material);
                 if (stat != 0) {
                     map.compute(id.getKey().getKey(), (k, v) -> v == null ? Maps.newHashMap() : v)

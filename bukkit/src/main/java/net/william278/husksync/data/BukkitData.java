@@ -313,7 +313,7 @@ public abstract class BukkitData implements Data {
 
                 // Only save the advancement if criteria has been completed
                 if (!awardedCriteria.isEmpty()) {
-                    advancements.add(Advancement.adapt(advancement.getKey().toString(), awardedCriteria));
+                    advancements.add(Advancement.adaptDate(advancement.getKey().toString(), awardedCriteria));
                 }
             });
             return new BukkitData.Advancements(advancements);
@@ -337,7 +337,7 @@ public abstract class BukkitData implements Data {
                     return;
                 }
 
-                final Map<String, Date> criteria = record.get().getCompletedCriteria();
+                final Map<String, Date> criteria = record.get().getCompletedCriteriaDate();
                 this.setAdvancement(
                         plugin, advancement, player, user,
                         criteria.keySet().stream().filter(key -> !progress.getAwardedCriteria().contains(key)).toList(),

@@ -318,7 +318,7 @@ public class LegacyMigrator extends Migrator {
                         // Advancements
                         .advancements(BukkitData.Advancements.from(converter
                                 .deserializeAdvancementData(serializedAdvancements).stream()
-                                .map(data -> Data.Advancements.Advancement.adapt(data.key(), data.criteriaMap()))
+                                .map(data -> Data.Advancements.Advancement.adaptDate(data.key(), data.criteriaMap()))
                                 .toList()))
 
                         // Stats

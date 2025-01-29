@@ -179,7 +179,7 @@ public class BukkitLegacyConverter extends LegacyConverter {
             criteria.keys().forEachRemaining(criteriaKey -> criteriaMap.put(
                     criteriaKey, parseDate(criteria.getString(criteriaKey)))
             );
-            converted.add(Data.Advancements.Advancement.adapt(key, criteriaMap));
+            converted.add(Data.Advancements.Advancement.adaptDate(key, criteriaMap));
         });
 
         return Optional.of(BukkitData.Advancements.from(converted));

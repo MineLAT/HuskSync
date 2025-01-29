@@ -2,7 +2,7 @@ name: CI Tests
 
 on:
   push:
-    branches: [ 'minecraft/1.20.1' ]
+    branches: [ 'minecraft/1.20.4' ]
     paths-ignore:
       - 'docs/**'
       - 'workflows/**'
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-    name: 'Build - 1.20.1'
+    name: 'Build - 1.20.4'
     runs-on: ubuntu-latest
     steps:
       - name: 'Setup JDK 21 📦'
@@ -29,8 +29,8 @@ jobs:
       - name: 'Checkout for CI 🛎️'
         uses: actions/checkout@v4
         with:
-          ref: 'minecraft/1.20.1'
-      - name: '[LTS - 1.20.1] Build 🛎️'
+          ref: 'minecraft/1.20.4'
+      - name: '[LTS - 1.20.4] Build 🛎️'
         run: |
           ./gradlew clean build publish
         env:
@@ -57,14 +57,14 @@ jobs:
           version: ${{ env.version_name }}
           changelog: ${{ github.event.head_commit.message }}
           distro-names: |
-            paper-1.20.1
-            fabric-1.20.1
+            paper-1.20.4
+            fabric-1.20.4
           distro-groups: |
             paper
             fabric
           distro-descriptions: |
-            Paper 1.20.1
-            Fabric 1.20.1
+            Paper 1.20.4
+            Fabric 1.20.4
           files: |
-            target/HuskSync-Paper-${{ env.version_name }}+mc.1.20.1.jar
-            target/HuskSync-Fabric-${{ env.version_name }}+mc.1.20.1.jar
+            target/HuskSync-Paper-${{ env.version_name }}+mc.1.20.4.jar
+            target/HuskSync-Fabric-${{ env.version_name }}+mc.1.20.4.jar

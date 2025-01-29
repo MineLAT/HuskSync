@@ -32,6 +32,7 @@ import net.william278.husksync.user.OnlineUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -174,9 +175,9 @@ public interface Data {
             @SerializedName("completed_criteria")
             private Map<String, Long> completedCriteria;
 
-            private Advancement(@NotNull String key, @NotNull Map<String, Date> completedCriteria) {
+            private Advancement(@NotNull String key, @NotNull Map<String, Long> completedCriteria) {
                 this.key = key;
-                this.completedCriteria = adaptDateMap(completedCriteria);
+                this.completedCriteria = completedCriteria;
             }
 
             @SuppressWarnings("unused")
@@ -184,8 +185,13 @@ public interface Data {
             }
 
             @NotNull
-            public static Advancement adapt(@NotNull String key, @NotNull Map<String, Date> completedCriteria) {
-                return new Advancement(key, completedCriteria);
+            public static Advancement adaptDate(@NotNull String key, @NotNull Map<String, Date> completedCriteria) {
+                return new Advancement(key, adaptDateMap(completedCriteria));
+            }
+
+            @NotNull
+            public static Advancement adaptInstant(@NotNull String key, @NotNull Map<String, Instant> completedCriteria) {
+                return new Advancement(key, adaptInstantMap(completedCriteria));
             }
 
             @NotNull
@@ -195,9 +201,21 @@ public interface Data {
             }
 
             @NotNull
-            private static Map<String, Date> adaptLongMap(@NotNull Map<String, Long> dateMap) {
+            private static Map<String, Long> adaptInstantMap(@NotNull Map<String, Instant> dateMap) {
+                return dateMap.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toEpochMilli()));
+            }
+
+            @NotNull
+            private static Map<String, Date> adaptLongToDate(@NotNull Map<String, Long> dateMap) {
                 return dateMap.entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> new Date(e.getValue())));
+            }
+
+            @NotNull
+            private static Map<String, Instant> adaptLongToInstant(@NotNull Map<String, Long> dateMap) {
+                return dateMap.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> Instant.ofEpochMilli(e.getValue())));
             }
 
             @NotNull
@@ -209,12 +227,16 @@ public interface Data {
                 this.key = key;
             }
 
-            public Map<String, Date> getCompletedCriteria() {
-                return adaptLongMap(completedCriteria);
+            public Map<String, Date> getCompletedCriteriaDate() {
+                return adaptLongToDate(completedCriteria);
             }
 
-            public void setCompletedCriteria(Map<String, Date> completedCriteria) {
-                this.completedCriteria = adaptDateMap(completedCriteria);
+            public Map<String, Instant> getCompletedCriteriaInstant() {
+                return adaptLongToInstant(completedCriteria);
+            }
+
+            public void setCompletedCriteria(Map<String, Instant> completedCriteria) {
+                this.completedCriteria = adaptInstantMap(completedCriteria);
             }
         }
 
@@ -356,6 +378,13 @@ public interface Data {
             private int operationType;
             @SerializedName("equipment_slot")
             private int equipmentSlot;
+
+            public Modifier(@NotNull UUID uuid, double amount, int operationType, int equipmentSlot) {
+                this.uuid = uuid;
+                this.amount = amount;
+                this.operationType = operationType;
+                this.equipmentSlot = equipmentSlot;
+            }
 
             public Modifier(@NotNull String name, double amount, int operationType, int equipmentSlot) {
                 this.name = name;

@@ -367,6 +367,8 @@ public class FabricHuskSync implements DedicatedServerModInitializer, HuskSync, 
             case "1.19", "1.19.1", "1.19.2" -> VERSION1_19_2;
             case "1.19.4" -> VERSION1_19_4;
             case "1.20", "1.20.1" -> VERSION1_20_1;
+            case "1.20.2" -> VERSION1_20_2;
+            case "1.20.3", "1.20.4" -> VERSION1_20_4;
             default -> VERSION1_20_1; // Current supported ver
         };
     }

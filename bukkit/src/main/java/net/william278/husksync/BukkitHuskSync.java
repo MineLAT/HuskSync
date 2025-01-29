@@ -340,6 +340,8 @@ public class BukkitHuskSync extends JavaPlugin implements HuskSync, BukkitTask.S
             case "1.18", "1.18.1", "1.18.2" -> DataFixerUtil.VERSION1_18_2;
             case "1.19", "1.19.1", "1.19.2" -> DataFixerUtil.VERSION1_19_2;
             case "1.20", "1.20.1" -> DataFixerUtil.VERSION1_20_1;
+            case "1.20.2" -> DataFixerUtil.VERSION1_20_2;
+            case "1.20.3", "1.20.4" -> DataFixerUtil.VERSION1_20_4;
             default -> DataFixerUtil.getCurrentVersion();
         };
     }

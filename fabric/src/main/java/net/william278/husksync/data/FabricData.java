@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.annotations.SerializedName;
 import lombok.*;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
+import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -56,6 +57,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.time.Instant;
 import java.util.*;
 
 import static net.william278.husksync.util.FabricKeyedAdapter.*;
@@ -313,14 +315,14 @@ public abstract class FabricData implements Data {
             final List<Advancement> advancements = Lists.newArrayList();
             forEachAdvancement(server, advancement -> {
                 final AdvancementProgress advancementProgress = player.getAdvancementTracker().getProgress(advancement);
-                final Map<String, Date> awardedCriteria = Maps.newHashMap();
+                final Map<String, Instant> awardedCriteria = Maps.newHashMap();
 
                 advancementProgress.getObtainedCriteria().forEach((criteria) -> awardedCriteria.put(criteria,
                         advancementProgress.getEarliestProgressObtainDate()));
 
                 // Only save the advancement if criteria has been completed
                 if (!awardedCriteria.isEmpty()) {
-                    advancements.add(Advancement.adapt(advancement.getId().toString(), awardedCriteria));
+                    advancements.add(Advancement.adaptInstant(advancement.id().toString(), awardedCriteria));
                 }
             });
             return new FabricData.Advancements(advancements);
@@ -338,13 +340,13 @@ public abstract class FabricData implements Data {
             plugin.runAsync(() -> forEachAdvancement(server, advancement -> {
                 final AdvancementProgress progress = player.getAdvancementTracker().getProgress(advancement);
                 final Optional<Advancement> record = completed.stream()
-                        .filter(r -> r.getKey().equals(advancement.getId().toString()))
+                        .filter(r -> r.getKey().equals(advancement.id().toString()))
                         .findFirst();
                 if (record.isEmpty()) {
                     return;
                 }
 
-                final Map<String, Date> criteria = record.get().getCompletedCriteria();
+                final Map<String, Instant> criteria = record.get().getCompletedCriteriaInstant();
                 final List<String> awarded = Lists.newArrayList(progress.getObtainedCriteria());
                 this.setAdvancement(
                         plugin, advancement, player, user,
@@ -355,7 +357,7 @@ public abstract class FabricData implements Data {
         }
 
         private void setAdvancement(@NotNull FabricHuskSync plugin,
-                                    @NotNull net.minecraft.advancement.Advancement advancement,
+                                    @NotNull AdvancementEntry advancement,
                                     @NotNull ServerPlayerEntity player,
                                     @NotNull FabricUser user,
                                     @NotNull List<String> toAward,
@@ -381,7 +383,7 @@ public abstract class FabricData implements Data {
 
         // Performs a consuming function for every advancement registered on the server
         private static void forEachAdvancement(@NotNull MinecraftServer server,
-                                               @NotNull ThrowingConsumer<net.minecraft.advancement.Advancement> con) {
+                                               @NotNull ThrowingConsumer<AdvancementEntry> con) {
             server.getAdvancementLoader().getAdvancements().forEach(con);
         }
 
@@ -587,7 +589,6 @@ public abstract class FabricData implements Data {
                 final Set<Modifier> modifiers = Sets.newHashSet();
                 instance.getModifiers().forEach(modifier -> modifiers.add(new Modifier(
                         modifier.getId(),
-                        modifier.getName(),
                         modifier.getValue(),
                         modifier.getOperation().getId(),
                         -1
@@ -635,7 +636,7 @@ public abstract class FabricData implements Data {
             if (instance == null) {
                 return;
             }
-            instance.getModifiers().forEach(instance::removeModifier);
+            instance.getModifiers().forEach(modifier -> instance.removeModifier(modifier.getId()));
             instance.setBaseValue(attribute == null ? instance.getValue() : attribute.baseValue());
             if (attribute != null) {
                 attribute.modifiers().forEach(modifier -> instance.addPersistentModifier(new EntityAttributeModifier(
